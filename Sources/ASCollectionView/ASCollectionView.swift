@@ -82,7 +82,9 @@ public struct ASCollectionView<SectionID: Hashable>: UIViewControllerRepresentab
 	@Environment(\.alwaysBounceVertical) private var alwaysBounceVertical
 	@Environment(\.initialScrollPosition) private var initialScrollPosition
 	@Environment(\.editMode) private var editMode
-
+    @Environment(\.isPagingEnabled) private var isPagingEnabled
+    @Environment(\.onPageChange) private var onPageChanged
+    
 	// MARK: Init for multi-section CVs
 
 	/**
@@ -110,13 +112,14 @@ public struct ASCollectionView<SectionID: Hashable>: UIViewControllerRepresentab
 		let delegate = delegateInitialiser()
 		context.coordinator.delegate = delegate
 		delegate.coordinator = context.coordinator
+        delegate.onPageChanged = onPageChanged
 
 		let collectionViewLayout = layout.makeLayout(withCoordinator: context.coordinator)
 
 		let collectionViewController = AS_CollectionViewController(collectionViewLayout: collectionViewLayout)
 		collectionViewController.coordinator = context.coordinator
 		updateCollectionViewSettings(collectionViewController.collectionView, delegate: delegate)
-
+        collectionViewController.collectionView.contentInset = contentInsets
 		context.coordinator.collectionViewController = collectionViewController
 
 		context.coordinator.setupDataSource(forCollectionView: collectionViewController.collectionView)
@@ -137,12 +140,13 @@ public struct ASCollectionView<SectionID: Hashable>: UIViewControllerRepresentab
 		collectionView.dragDelegate = delegate
 		collectionView.dropDelegate = delegate
 		collectionView.dragInteractionEnabled = true
-		collectionView.contentInsetAdjustmentBehavior = delegate?.collectionViewContentInsetAdjustmentBehavior ?? .automatic
-		collectionView.contentInset = contentInsets
+        collectionView.contentInsetAdjustmentBehavior = .never
+        collectionView.keyboardDismissMode = .interactive
 		collectionView.alwaysBounceVertical = alwaysBounceVertical
 		collectionView.alwaysBounceHorizontal = alwaysBounceHorizontal
 		collectionView.showsVerticalScrollIndicator = scrollIndicatorsEnabled
 		collectionView.showsHorizontalScrollIndicator = scrollIndicatorsEnabled
+        collectionView.isPagingEnabled = isPagingEnabled
 
 		let isEditing = editMode?.wrappedValue.isEditing ?? false
 		collectionView.allowsSelection = isEditing

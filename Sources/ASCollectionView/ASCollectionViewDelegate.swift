@@ -7,6 +7,7 @@ import SwiftUI
 open class ASCollectionViewDelegate: NSObject, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
 {
 	weak var coordinator: ASCollectionViewCoordinator?
+    var onPageChanged: ((Int) -> ())?
 
 	public func getDataForItem(at indexPath: IndexPath) -> Any?
 	{
@@ -62,6 +63,11 @@ open class ASCollectionViewDelegate: NSObject, UICollectionViewDelegate, UIColle
 	{
 		coordinator?.collectionView(collectionView, didDeselectItemAt: indexPath)
 	}
+    
+    public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let currentPage = Int(scrollView.contentOffset.y / scrollView.frame.size.height)
+        onPageChanged?(currentPage)
+    }
 
 	/*
 	 //REPLACED WITH CUSTOM PREFETCH SOLUTION AS PREFETCH API WAS NOT WORKING FOR COMPOSITIONAL LAYOUT

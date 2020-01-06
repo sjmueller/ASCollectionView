@@ -43,6 +43,16 @@ struct EnvironmentKeyASInitialScrollPosition: EnvironmentKey
 	static let defaultValue: ASCollectionViewScrollPosition? = nil
 }
 
+struct EnvironmentKeyASIsPagingEnabled: EnvironmentKey
+{
+    static let defaultValue: Bool = false
+}
+
+struct EnvironmentKeyASOnPageChange: EnvironmentKey
+{
+    static let defaultValue: ((Int) -> ())? = nil
+}
+
 public extension EnvironmentValues
 {
 	var invalidateCellLayout: () -> Void
@@ -92,6 +102,16 @@ public extension EnvironmentValues
 		get { return self[EnvironmentKeyASInitialScrollPosition.self] }
 		set { self[EnvironmentKeyASInitialScrollPosition.self] = newValue }
 	}
+    
+    var isPagingEnabled: Bool {
+        get { return self[EnvironmentKeyASIsPagingEnabled.self] }
+        set { self[EnvironmentKeyASIsPagingEnabled.self] = newValue }
+    }
+    
+    var onPageChange: ((Int) -> ())? {
+        get { return self[EnvironmentKeyASOnPageChange.self] }
+        set { self[EnvironmentKeyASOnPageChange.self] = newValue }
+    }
 }
 
 public extension View
@@ -130,4 +150,14 @@ public extension View
 	{
 		environment(\.initialScrollPosition, scrollPosition)
 	}
+
+    func isPagingEnabled(_ isPagingEnabled: Bool) -> some View
+    {
+        environment(\.isPagingEnabled, isPagingEnabled)
+    }
+
+    func onPageChange(_ onPageChange: @escaping ((Int) -> Void)) -> some View
+    {
+        environment(\.onPageChange, onPageChange)
+    }
 }
